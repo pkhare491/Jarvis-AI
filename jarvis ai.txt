@@ -1,0 +1,230 @@
+together ai api- 848104e1bc6ec4a5a7a645ce4269c2405ec2c53fd564c23838572a94b2743d25
+open weather api - 01f8c02a92aeb6f7c99c398dc87deb8a
+
+
+Jarvis AI
+Script.js
+// script.js
+
+let isListening = false;
+let recognition;
+let microphonePermissionGranted = false;
+
+// Function to start listening
+function startListening() {
+    if (isListening) return;
+
+    if (!microphonePermissionGranted) {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                console.log('Microphone access granted.');
+                microphonePermissionGranted = true;
+                initializeRecognition();
+            })
+            .catch(error => {
+                console.error('Microphone access denied:', error);
+                document.getElementById('output').innerText = 'Microphone access denied. Please grant microphone access.';
+            });
+    } else {
+        initializeRecognition();
+    }
+}
+
+function initializeRecognition() {
+    recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+        console.log('Jarvis is now listening...');
+        document.getElementById('output').innerText = 'Jarvis is now listening...';
+        isListening = true;
+    };
+
+    recognition.onresult = (event) => {
+        const command = event.results[0][0].transcript;
+        console.log(`User said: ${command}`);
+        document.getElementById('output').innerText = `You said: ${command}`;
+
+        processCommand(command);
+
+        setTimeout(() => {
+            if (isListening) {
+                recognition.start();
+            }
+        }, 2000);
+    };
+
+    recognition.onerror = (event) => {
+        console.error('Error occurred in recognition:', event.error);
+        document.getElementById('output').innerText += `\nError: ${event.error}`;
+    };
+
+    recognition.onend = () => {
+        if (isListening) {
+            console.log('Jarvis is restarting listening...');
+            document.getElementById('output').innerText += '\nJarvis is restarting listening...';
+            recognition.start();
+        } else {
+            console.log('Jarvis has stopped listening.');
+            document.getElementById('output').innerText += '\nJarvis has stopped listening.';
+        }
+    };
+
+    recognition.start();
+}
+
+function processCommand(command) {
+    if (command.toLowerCase().includes('hi jarvis')) {
+        say('Hi Boss, How can I help you today?');
+    } else if (command.toLowerCase().includes('open google')) {
+        window.open('https://www.google.com');
+    } else if (command.toLowerCase().includes('open youtube')) {
+        window.open('https://www.youtube.com');
+    } else if (command.toLowerCase().includes('open live application')) {
+        window.open('https://dcredprdap6001.morningstar.com:8080/#/Login');
+    } else if (command.toLowerCase().includes('open wikipedia')) {
+        window.open('https://www.wikipedia.com');
+    } else if (command.toLowerCase().includes('open testing application')) {
+        window.open('http://dccompanyopsstg.dc68032.easn.morningstar.com/compOpsUI/#/CompanyOpsMaster');
+    } else if (command.toLowerCase().includes('stop jarvis')) {
+        say('Ok Boss, Bye');
+        stopListening();
+    } else {
+        document.getElementById('output').innerText += `\nJarvis did not understand the command.`;
+    }
+}
+
+function stopListening() {
+    if (recognition) {
+        recognition.stop();
+    }
+    isListening = false;
+    console.log('Jarvis stopped listening.');
+    document.getElementById('output').innerText += '\nJarvis stopped listening.';
+}
+
+function say(text) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    speechSynthesis.speak(utterance);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    startListening(); // Start listening on page load
+    document.getElementById('stop-button').addEventListener('click', stopListening);
+});
+
+
+
+
+
+
+
+
+
+styles.css
+/* styles.css */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #282c34;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.container {
+    text-align: center;
+    position: relative;
+}
+
+.header {
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: #f1c40f;
+}
+
+#ironman {
+    width: 300px;
+    height: auto;
+    animation: pulse 2s infinite;
+}
+
+.output {
+    background-color: #333;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px auto;
+    width: 80%;
+    max-width: 600px;
+    font-size: 1.2rem;
+    text-align: center;
+    min-height: 100px;
+}
+
+.stop-button {
+    background-color: #e74c3c;
+    border: none;
+    color: #fff;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.stop-button:hover {
+    background-color: #c0392b;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+
+
+
+
+
+
+
+index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jarvis AI Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Jarvis AI Assistant</h1>
+        </div>
+        <div class="content">
+            <img id="ironman" src="ironman.png" alt="Iron Man" />
+            <div id="output" class="output"></div>
+        </div>
+        <button id="stop-button" class="stop-button">Stop Listening</button>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
